@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class pegSolitaireSolver {
 
@@ -59,23 +60,28 @@ public class pegSolitaireSolver {
 
 			// initialize the configuration to one of 4 START setups n=0,1,2,3
 			HiRiQ(byte n) {
-				if (n==0)
-				   {config=65536/2;weight=1;}
-				  else
-				    if (n==1)
-				     {config=1626;weight=6;}
-				    else
-				      if (n==2)
-				       {config=-1140868948; weight=10;}
-				      else
-				        if (n==3)
-				         {config=-411153748; weight=13;}
-				        else
-				         {config=-2147450879; weight=32;}
+				if (n==0){
+					config=32768;
+					weight=1;
+				}else if (n==1){
+					config=1626;
+					weight=6;
+				}else if (n==2){
+				    config=-1140868948;
+				    weight=10;
+				}else if (n==3){
+					config=-411153748; 
+					weight=13;
+				}else if (n==4){
+					Random random = new Random();
+					int randomPegPosition = random.nextInt(32);
+					config= (int) Math.pow(2, randomPegPosition);;
+				    weight=1;
+				 }else{
+				 	config=-2147450879; 
+				 	weight=32;
+				 }
 			}
-
-			// initialize the configuration to one of 4 START setups
-			// n=0,10,20,30
 
 			boolean IsSolved() {
 				return ((config == 65536 / 2) && (weight == 1));
@@ -127,6 +133,23 @@ public class pegSolitaireSolver {
 				}
 				B[0] = count < weight;
 				return (B);
+			}
+
+			public byte getWeight(int config){ //the true value of the weight will be off by 1 if first tile is empty (no peg)
+				byte currentWeight = 0;
+				if(config < 0){
+					config = -config;
+					currentWeight++;
+				}
+				int a = 2;
+				for(int i = 1; i<32; i++){
+					if(config % a != 0){
+						config = config - a/2;
+						currentWeight++;
+					}
+					a = a*2;
+				}
+				return currentWeight;
 			}
 
 			// prints the int representation to an array of booleans.
@@ -191,6 +214,7 @@ public class pegSolitaireSolver {
 				System.out.println();
 
 			}
+
 			//THE SOLVER METHOD takes the config as input and return the substitutions (also prints the number of iterations and displays the current board being processed)
 			public String solve(boolean[] inputConfig) { 
 				int level = 0; //integer used to refer to the depth of nodes
@@ -352,7 +376,8 @@ public class pegSolitaireSolver {
 		}
 
 		boolean[] B = new boolean[33];
-		HiRiQ Y = new HiRiQ((byte) 2); //n=3 and n=2 runs in about 15 seconds and about 33000 iterations, also n=1 is solved instantly (112 iterations) 
+		HiRiQ Y = new HiRiQ((byte) 3); //n=3 and n=2 runs in about 15 seconds and about 33000 iterations, also n=1 is solved instantly (112 iterations) 
+		//System.out.println(Y.getWeight(testConfig));
 		System.out.println(Y.solve(Y.load(B)));
 	}
 
